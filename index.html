@@ -1,215 +1,51 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>배너 캐러셀</title>
+    <title>Scrolling Text Banner</title>
     <style>
-      * {
+      body {
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Arial", sans-serif;
-        background: #f0f0f0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-      }
-
-      .carousel-container {
-        width: 800px;
-        height: 400px;
-        position: relative;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(to right, #fceabb, #f8b500);
         overflow: hidden;
       }
 
-      .carousel-wrapper {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .carousel-slide {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
+      .banner-container {
+        width: 100vw;
+        height: 200px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 3rem;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .scroll-text {
+        display: inline-block;
+        font-size: 64px;
         font-weight: bold;
         color: white;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        padding-left: 100%;
+        animation: scroll-left 15s linear infinite;
       }
 
-      .carousel-slide.active {
-        opacity: 1;
-        transform: translateX(0);
-      }
-
-      .carousel-slide.prev {
-        transform: translateX(-100%);
-      }
-
-      .slide-1 {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      }
-
-      .slide-2 {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      }
-
-      .carousel-nav {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 12px;
-      }
-
-      .nav-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
-        cursor: pointer;
-        transition: all 0.1s ease;
-      }
-
-      .nav-dot.active {
-        background: white;
-        transform: scale(1.2);
-      }
-
-      @media (max-width: 768px) {
-        .carousel-container {
-          width: 95%;
-          height: 250px;
+      @keyframes scroll-left {
+        0% {
+          transform: translateX(0);
         }
-
-        .carousel-slide {
-          font-size: 2rem;
-        }
-
-        .carousel-arrow {
-          font-size: 1.5rem;
-          padding: 10px 15px;
+        100% {
+          transform: translateX(-100%);
         }
       }
     </style>
   </head>
   <body>
-    <div class="carousel-container">
-      <div class="carousel-wrapper">
-        <div class="carousel-slide slide-1 active">media push</div>
-        <div class="carousel-slide slide-2">banner test</div>
-      </div>
-
-      <div class="carousel-nav">
-        <div class="nav-dot active" onclick="goToSlide(0)"></div>
-        <div class="nav-dot" onclick="goToSlide(1)"></div>
+    <div class="banner-container">
+      <div class="scroll-text">
+        &nbsp;&nbsp;&nbsp;&nbsp;🚀 Media Push • 🎬 Banner Test • 🚀 Media Push •
+        🎬 Banner Test •
       </div>
     </div>
-
-    <script>
-      let currentSlide = 0;
-      const slides = document.querySelectorAll(".carousel-slide");
-      const dots = document.querySelectorAll(".nav-dot");
-      const totalSlides = slides.length;
-      let autoPlayInterval;
-
-      function showSlide(index) {
-        // 모든 슬라이드 초기화
-        slides.forEach((slide, i) => {
-          slide.classList.remove("active", "prev");
-          if (i === index) {
-            slide.classList.add("active");
-          } else if (i < index) {
-            slide.classList.add("prev");
-          }
-        });
-
-        // 네비게이션 dots 업데이트
-        dots.forEach((dot, i) => {
-          dot.classList.toggle("active", i === index);
-        });
-
-        currentSlide = index;
-      }
-
-      function nextSlide() {
-        const nextIndex = (currentSlide + 1) % totalSlides;
-        showSlide(nextIndex);
-      }
-
-      function previousSlide() {
-        const prevIndex = (currentSlide - 1 + totalSlides) % totalSlides;
-        showSlide(prevIndex);
-      }
-
-      function goToSlide(index) {
-        showSlide(index);
-      }
-
-      function startAutoPlay() {
-        autoPlayInterval = setInterval(() => {
-          nextSlide();
-        }, 1000); // 3초로 단축
-      }
-
-      function stopAutoPlay() {
-        clearInterval(autoPlayInterval);
-      }
-
-      // 자동 재생 시작
-      startAutoPlay();
-
-      // 마우스 호버 시 자동 재생 일시 정지
-      const carousel = document.querySelector(".carousel-container");
-      carousel.addEventListener("mouseenter", stopAutoPlay);
-      carousel.addEventListener("mouseleave", startAutoPlay);
-
-      // 터치 스와이프 지원 (선택적)
-      let startX = 0;
-      let endX = 0;
-
-      carousel.addEventListener("touchstart", e => {
-        startX = e.touches[0].clientX;
-        stopAutoPlay(); // 터치 시 자동 재생 정지
-      });
-
-      carousel.addEventListener("touchend", e => {
-        endX = e.changedTouches[0].clientX;
-        handleSwipe();
-        startAutoPlay(); // 터치 종료 시 자동 재생 재시작
-      });
-
-      function handleSwipe() {
-        const swipeThreshold = 50;
-        const diff = startX - endX;
-
-        if (Math.abs(diff) > swipeThreshold) {
-          if (diff > 0) {
-            nextSlide();
-          } else {
-            previousSlide();
-          }
-        }
-      }
-    </script>
   </body>
 </html>
